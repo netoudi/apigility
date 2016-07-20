@@ -29,6 +29,15 @@ return array(
                     ),
                 ),
             ),
+            'code-orders.rest.products' => array(
+                'type' => 'Segment',
+                'options' => array(
+                    'route' => '/products[/:products_id]',
+                    'defaults' => array(
+                        'controller' => 'CodeOrders\\V1\\Rest\\Products\\Controller',
+                    ),
+                ),
+            ),
         ),
     ),
     'zf-versioning' => array(
@@ -36,6 +45,7 @@ return array(
             0 => 'code-orders.rest.ptypes',
             1 => 'code-orders.rest.users',
             2 => 'code-orders.rest.clients',
+            3 => 'code-orders.rest.products',
         ),
     ),
     'zf-rest' => array(
@@ -105,12 +115,35 @@ return array(
             'collection_class' => 'CodeOrders\\V1\\Rest\\Clients\\ClientsCollection',
             'service_name' => 'clients',
         ),
+        'CodeOrders\\V1\\Rest\\Products\\Controller' => array(
+            'listener' => 'CodeOrders\\V1\\Rest\\Products\\ProductsResource',
+            'route_name' => 'code-orders.rest.products',
+            'route_identifier_name' => 'products_id',
+            'collection_name' => 'products',
+            'entity_http_methods' => array(
+                0 => 'GET',
+                1 => 'PATCH',
+                2 => 'PUT',
+                3 => 'DELETE',
+            ),
+            'collection_http_methods' => array(
+                0 => 'GET',
+                1 => 'POST',
+            ),
+            'collection_query_whitelist' => array(),
+            'page_size' => 25,
+            'page_size_param' => null,
+            'entity_class' => 'CodeOrders\\V1\\Rest\\Products\\ProductsEntity',
+            'collection_class' => 'CodeOrders\\V1\\Rest\\Products\\ProductsCollection',
+            'service_name' => 'products',
+        ),
     ),
     'zf-content-negotiation' => array(
         'controllers' => array(
             'CodeOrders\\V1\\Rest\\Ptypes\\Controller' => 'HalJson',
             'CodeOrders\\V1\\Rest\\Users\\Controller' => 'HalJson',
             'CodeOrders\\V1\\Rest\\Clients\\Controller' => 'HalJson',
+            'CodeOrders\\V1\\Rest\\Products\\Controller' => 'HalJson',
         ),
         'accept_whitelist' => array(
             'CodeOrders\\V1\\Rest\\Ptypes\\Controller' => array(
@@ -124,6 +157,11 @@ return array(
                 2 => 'application/json',
             ),
             'CodeOrders\\V1\\Rest\\Clients\\Controller' => array(
+                0 => 'application/vnd.code-orders.v1+json',
+                1 => 'application/hal+json',
+                2 => 'application/json',
+            ),
+            'CodeOrders\\V1\\Rest\\Products\\Controller' => array(
                 0 => 'application/vnd.code-orders.v1+json',
                 1 => 'application/hal+json',
                 2 => 'application/json',
@@ -142,6 +180,11 @@ return array(
             'CodeOrders\\V1\\Rest\\Clients\\Controller' => array(
                 0 => 'application/vnd.code-orders.v1+json',
                 1 => 'application/json',
+            ),
+            'CodeOrders\\V1\\Rest\\Products\\Controller' => array(
+                0 => 'application/vnd.code-orders.v1+json',
+                1 => 'application/json',
+                2 => 'application/x-www-form-urlencoded',
             ),
         ),
     ),
@@ -181,6 +224,18 @@ return array(
                 'entity_identifier_name' => 'id',
                 'route_name' => 'code-orders.rest.clients',
                 'route_identifier_name' => 'clients_id',
+                'is_collection' => true,
+            ),
+            'CodeOrders\\V1\\Rest\\Products\\ProductsEntity' => array(
+                'entity_identifier_name' => 'id',
+                'route_name' => 'code-orders.rest.products',
+                'route_identifier_name' => 'products_id',
+                'hydrator' => 'Zend\\Hydrator\\ClassMethods',
+            ),
+            'CodeOrders\\V1\\Rest\\Products\\ProductsCollection' => array(
+                'entity_identifier_name' => 'id',
+                'route_name' => 'code-orders.rest.products',
+                'route_identifier_name' => 'products_id',
                 'is_collection' => true,
             ),
         ),
@@ -429,6 +484,8 @@ return array(
         'factories' => array(
             'CodeOrders\\V1\\Rest\\Users\\UsersResource' => 'CodeOrders\\V1\\Rest\\Users\\UsersResourceFactory',
             'CodeOrders\\V1\\Rest\\Users\\UsersRepository' => 'CodeOrders\\V1\\Rest\\Users\\UsersRepositoryFactory',
+            'CodeOrders\\V1\\Rest\\Products\\ProductsResource' => 'CodeOrders\\V1\\Rest\\Products\\ProductsResourceFactory',
+            'CodeOrders\\V1\\Rest\\Products\\ProductsRepository' => 'CodeOrders\\V1\\Rest\\Products\\ProductsRepositoryFactory',
         ),
     ),
 );
