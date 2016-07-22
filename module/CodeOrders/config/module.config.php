@@ -2,15 +2,6 @@
 return array(
     'router' => array(
         'routes' => array(
-            'code-orders.rest.ptypes' => array(
-                'type' => 'Segment',
-                'options' => array(
-                    'route' => '/ptypes[/:ptypes_id]',
-                    'defaults' => array(
-                        'controller' => 'CodeOrders\\V1\\Rest\\Ptypes\\Controller',
-                    ),
-                ),
-            ),
             'code-orders.rest.users' => array(
                 'type' => 'Segment',
                 'options' => array(
@@ -47,40 +38,27 @@ return array(
                     ),
                 ),
             ),
+            'code-orders.rest.ptypes' => array(
+                'type' => 'Segment',
+                'options' => array(
+                    'route' => '/ptypes[/:ptypes_id]',
+                    'defaults' => array(
+                        'controller' => 'CodeOrders\\V1\\Rest\\Ptypes\\Controller',
+                    ),
+                ),
+            ),
         ),
     ),
     'zf-versioning' => array(
         'uri' => array(
-            0 => 'code-orders.rest.ptypes',
             1 => 'code-orders.rest.users',
             3 => 'code-orders.rest.products',
             4 => 'code-orders.rest.orders',
             5 => 'code-orders.rest.clients',
+            0 => 'code-orders.rest.ptypes',
         ),
     ),
     'zf-rest' => array(
-        'CodeOrders\\V1\\Rest\\Ptypes\\Controller' => array(
-            'listener' => 'CodeOrders\\V1\\Rest\\Ptypes\\PtypesResource',
-            'route_name' => 'code-orders.rest.ptypes',
-            'route_identifier_name' => 'ptypes_id',
-            'collection_name' => 'ptypes',
-            'entity_http_methods' => array(
-                0 => 'GET',
-                1 => 'PATCH',
-                2 => 'PUT',
-                3 => 'DELETE',
-            ),
-            'collection_http_methods' => array(
-                0 => 'GET',
-                1 => 'POST',
-            ),
-            'collection_query_whitelist' => array(),
-            'page_size' => 25,
-            'page_size_param' => null,
-            'entity_class' => 'CodeOrders\\V1\\Rest\\Ptypes\\PtypesEntity',
-            'collection_class' => 'CodeOrders\\V1\\Rest\\Ptypes\\PtypesCollection',
-            'service_name' => 'ptypes',
-        ),
         'CodeOrders\\V1\\Rest\\Users\\Controller' => array(
             'listener' => 'CodeOrders\\V1\\Rest\\Users\\UsersResource',
             'route_name' => 'code-orders.rest.users',
@@ -169,21 +147,38 @@ return array(
             'collection_class' => 'CodeOrders\\V1\\Rest\\Clients\\ClientsCollection',
             'service_name' => 'clients',
         ),
+        'CodeOrders\\V1\\Rest\\Ptypes\\Controller' => array(
+            'listener' => 'CodeOrders\\V1\\Rest\\Ptypes\\PtypesResource',
+            'route_name' => 'code-orders.rest.ptypes',
+            'route_identifier_name' => 'ptypes_id',
+            'collection_name' => 'ptypes',
+            'entity_http_methods' => array(
+                0 => 'GET',
+                1 => 'PATCH',
+                2 => 'PUT',
+                3 => 'DELETE',
+            ),
+            'collection_http_methods' => array(
+                0 => 'GET',
+                1 => 'POST',
+            ),
+            'collection_query_whitelist' => array(),
+            'page_size' => 25,
+            'page_size_param' => null,
+            'entity_class' => 'CodeOrders\\V1\\Rest\\Ptypes\\PtypesEntity',
+            'collection_class' => 'CodeOrders\\V1\\Rest\\Ptypes\\PtypesCollection',
+            'service_name' => 'ptypes',
+        ),
     ),
     'zf-content-negotiation' => array(
         'controllers' => array(
-            'CodeOrders\\V1\\Rest\\Ptypes\\Controller' => 'HalJson',
             'CodeOrders\\V1\\Rest\\Users\\Controller' => 'HalJson',
             'CodeOrders\\V1\\Rest\\Products\\Controller' => 'HalJson',
             'CodeOrders\\V1\\Rest\\Orders\\Controller' => 'HalJson',
             'CodeOrders\\V1\\Rest\\Clients\\Controller' => 'HalJson',
+            'CodeOrders\\V1\\Rest\\Ptypes\\Controller' => 'HalJson',
         ),
         'accept_whitelist' => array(
-            'CodeOrders\\V1\\Rest\\Ptypes\\Controller' => array(
-                0 => 'application/vnd.code-orders.v1+json',
-                1 => 'application/hal+json',
-                2 => 'application/json',
-            ),
             'CodeOrders\\V1\\Rest\\Users\\Controller' => array(
                 0 => 'application/vnd.code-orders.v1+json',
                 1 => 'application/hal+json',
@@ -200,16 +195,17 @@ return array(
                 2 => 'application/json',
             ),
             'CodeOrders\\V1\\Rest\\Clients\\Controller' => array(
+                0 => 'application/vnd.code-orders.v1+json',
+                1 => 'application/hal+json',
+                2 => 'application/json',
+            ),
+            'CodeOrders\\V1\\Rest\\Ptypes\\Controller' => array(
                 0 => 'application/vnd.code-orders.v1+json',
                 1 => 'application/hal+json',
                 2 => 'application/json',
             ),
         ),
         'content_type_whitelist' => array(
-            'CodeOrders\\V1\\Rest\\Ptypes\\Controller' => array(
-                0 => 'application/vnd.code-orders.v1+json',
-                1 => 'application/json',
-            ),
             'CodeOrders\\V1\\Rest\\Users\\Controller' => array(
                 0 => 'application/vnd.code-orders.v1+json',
                 1 => 'application/json',
@@ -225,6 +221,11 @@ return array(
                 1 => 'application/json',
             ),
             'CodeOrders\\V1\\Rest\\Clients\\Controller' => array(
+                0 => 'application/vnd.code-orders.v1+json',
+                1 => 'application/json',
+                2 => 'application/x-www-form-urlencoded',
+            ),
+            'CodeOrders\\V1\\Rest\\Ptypes\\Controller' => array(
                 0 => 'application/vnd.code-orders.v1+json',
                 1 => 'application/json',
                 2 => 'application/x-www-form-urlencoded',
@@ -233,18 +234,6 @@ return array(
     ),
     'zf-hal' => array(
         'metadata_map' => array(
-            'CodeOrders\\V1\\Rest\\Ptypes\\PtypesEntity' => array(
-                'entity_identifier_name' => 'id',
-                'route_name' => 'code-orders.rest.ptypes',
-                'route_identifier_name' => 'ptypes_id',
-                'hydrator' => 'Zend\\Hydrator\\ArraySerializable',
-            ),
-            'CodeOrders\\V1\\Rest\\Ptypes\\PtypesCollection' => array(
-                'entity_identifier_name' => 'id',
-                'route_name' => 'code-orders.rest.ptypes',
-                'route_identifier_name' => 'ptypes_id',
-                'is_collection' => true,
-            ),
             'CodeOrders\\V1\\Rest\\Users\\UsersEntity' => array(
                 'entity_identifier_name' => 'id',
                 'route_name' => 'code-orders.rest.users',
@@ -293,24 +282,24 @@ return array(
                 'route_identifier_name' => 'clients_id',
                 'is_collection' => true,
             ),
-        ),
-    ),
-    'zf-apigility' => array(
-        'db-connected' => array(
-            'CodeOrders\\V1\\Rest\\Ptypes\\PtypesResource' => array(
-                'adapter_name' => 'DbAdapter',
-                'table_name' => 'ptypes',
-                'hydrator_name' => 'Zend\\Hydrator\\ArraySerializable',
-                'controller_service_name' => 'CodeOrders\\V1\\Rest\\Ptypes\\Controller',
+            'CodeOrders\\V1\\Rest\\Ptypes\\PtypesEntity' => array(
                 'entity_identifier_name' => 'id',
-                'table_service' => 'CodeOrders\\V1\\Rest\\Ptypes\\PtypesResource\\Table',
+                'route_name' => 'code-orders.rest.ptypes',
+                'route_identifier_name' => 'ptypes_id',
+                'hydrator' => 'Zend\\Hydrator\\ClassMethods',
+            ),
+            'CodeOrders\\V1\\Rest\\Ptypes\\PtypesCollection' => array(
+                'entity_identifier_name' => 'id',
+                'route_name' => 'code-orders.rest.ptypes',
+                'route_identifier_name' => 'ptypes_id',
+                'is_collection' => true,
             ),
         ),
     ),
+    'zf-apigility' => array(
+        'db-connected' => array(),
+    ),
     'zf-content-validation' => array(
-        'CodeOrders\\V1\\Rest\\Ptypes\\Controller' => array(
-            'input_filter' => 'CodeOrders\\V1\\Rest\\Ptypes\\Validator',
-        ),
         'CodeOrders\\V1\\Rest\\Users\\Controller' => array(
             'input_filter' => 'CodeOrders\\V1\\Rest\\Users\\Validator',
         ),
@@ -537,6 +526,8 @@ return array(
             'CodeOrders\\V1\\Rest\\Orders\\OrdersService' => 'CodeOrders\\V1\\Rest\\Orders\\OrdersServiceFactory',
             'CodeOrders\\V1\\Rest\\Clients\\ClientsResource' => 'CodeOrders\\V1\\Rest\\Clients\\ClientsResourceFactory',
             'CodeOrders\\V1\\Rest\\Clients\\ClientsRepository' => 'CodeOrders\\V1\\Rest\\Clients\\ClientsRepositoryFactory',
+            'CodeOrders\\V1\\Rest\\Ptypes\\PtypesResource' => 'CodeOrders\\V1\\Rest\\Ptypes\\PtypesResourceFactory',
+            'CodeOrders\\V1\\Rest\\Ptypes\\PtypesRepository' => 'CodeOrders\\V1\\Rest\\Ptypes\\PtypesRepositoryFactory',
         ),
     ),
 );
