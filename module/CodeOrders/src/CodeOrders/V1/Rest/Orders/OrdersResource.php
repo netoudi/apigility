@@ -2,11 +2,16 @@
 
 namespace CodeOrders\V1\Rest\Orders;
 
+use CodeOrders\V1\Rest\Auth\AuthService;
 use ZF\ApiProblem\ApiProblem;
 use ZF\Rest\AbstractResourceListener;
 
 class OrdersResource extends AbstractResourceListener
 {
+    /**
+     * @var AuthService
+     */
+    private $authService;
     /**
      * @var OrdersRepository
      */
@@ -18,11 +23,13 @@ class OrdersResource extends AbstractResourceListener
 
     /**
      * OrdersResource constructor.
+     * @param AuthService $authService
      * @param OrdersRepository $repository
      * @param OrdersService $service
      */
-    public function __construct(OrdersRepository $repository, OrdersService $service)
+    public function __construct(AuthService $authService, OrdersRepository $repository, OrdersService $service)
     {
+        $this->authService = $authService;
         $this->repository = $repository;
         $this->service = $service;
     }
@@ -36,9 +43,11 @@ class OrdersResource extends AbstractResourceListener
     public function create($data)
     {
         try {
+            $this->authService->hasRole(['admin', 'salesman']);
+            $data->user_id = $this->authService->getUser()->getId();
             return $this->service->insert($data);
         } catch (\Exception $e) {
-            return new ApiProblem(405, $e->getMessage());
+            return new ApiProblem($e->getCode(), $e->getMessage());
         }
     }
 
@@ -51,9 +60,10 @@ class OrdersResource extends AbstractResourceListener
     public function delete($id)
     {
         try {
+            $this->authService->hasRole('admin');
             return $this->service->delete($id);
         } catch (\Exception $e) {
-            return new ApiProblem(405, $e->getMessage());
+            return new ApiProblem($e->getCode(), $e->getMessage());
         }
     }
 
@@ -77,9 +87,14 @@ class OrdersResource extends AbstractResourceListener
     public function fetch($id)
     {
         try {
-            return $this->repository->find($id);
+            $this->authService->hasRole(['admin', 'salesman']);
+            if ($this->authService->isAdmin()) {
+                return $this->repository->find($id);
+            } else {
+                return $this->repository->findBySalesman($id, $this->authService->getUser()->getId());
+            }
         } catch (\Exception $e) {
-            return new ApiProblem(405, $e->getMessage());
+            return new ApiProblem($e->getCode(), $e->getMessage());
         }
     }
 
@@ -91,7 +106,16 @@ class OrdersResource extends AbstractResourceListener
      */
     public function fetchAll($params = array())
     {
-        return $this->repository->findAll();
+        try {
+            $this->authService->hasRole(['admin', 'salesman']);
+            if ($this->authService->isAdmin()) {
+                return $this->repository->findAll();
+            } else {
+                return $this->repository->findAllBySalesman($this->authService->getUser()->getId());
+            }
+        } catch (\Exception $e) {
+            return new ApiProblem($e->getCode(), $e->getMessage());
+        }
     }
 
     /**
@@ -126,6 +150,11 @@ class OrdersResource extends AbstractResourceListener
      */
     public function update($id, $data)
     {
-        return new ApiProblem(405, 'The PUT method has not been defined for individual resources');
+        try {
+            $this->authService->hasRole('admin');
+            return $this->service->update($id, $data);
+        } catch (\Exception $e) {
+            return new ApiProblem($e->getCode(), $e->getMessage());
+        }
     }
 }

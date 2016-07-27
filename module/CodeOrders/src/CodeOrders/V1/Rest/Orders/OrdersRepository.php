@@ -102,4 +102,45 @@ class OrdersRepository
     {
         return $this->itemTable;
     }
+
+    public function findBySalesman($id, $idSalesman)
+    {
+        $hydrator = new ClassMethods();
+        $hydrator->addStrategy('items', new OrdersItemsHydratorStrategy(new ClassMethods()));
+        $order = $this->orderTable->select(['id' => (int)$id, 'user_id' => (int)$idSalesman])->current();
+
+        if (!$order) {
+            throw new \Exception('Entity not found.');
+        }
+
+        $items = $this->itemTable->select(['order_id' => $order->getId()]);
+
+        foreach ($items as $item) {
+            $order->addItem($item);
+        }
+
+        return $hydrator->extract($order);
+    }
+
+    public function findAllBySalesman($idSalesman)
+    {
+        $hydrator = new ClassMethods();
+        $hydrator->addStrategy('items', new OrdersItemsHydratorStrategy(new ClassMethods()));
+        $orders = $this->orderTable->select(['user_id' => (int)$idSalesman]);
+        $result = [];
+
+        foreach ($orders as $order) {
+            $items = $this->itemTable->select(['order_id' => $order->getId()]);
+            foreach ($items as $item) {
+                $order->addItem($item);
+            }
+
+            $result[] = $hydrator->extract($order);
+        }
+
+        $arrayAdapter = new ArrayAdapter($result);
+        $ordersCollection = new OrdersCollection($arrayAdapter);
+
+        return $ordersCollection;
+    }
 }

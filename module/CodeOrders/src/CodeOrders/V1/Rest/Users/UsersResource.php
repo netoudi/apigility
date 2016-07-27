@@ -2,11 +2,16 @@
 
 namespace CodeOrders\V1\Rest\Users;
 
+use CodeOrders\V1\Rest\Auth\AuthService;
 use ZF\ApiProblem\ApiProblem;
 use ZF\Rest\AbstractResourceListener;
 
 class UsersResource extends AbstractResourceListener
 {
+    /**
+     * @var AuthService
+     */
+    private $authService;
     /**
      * @var UsersRepository
      */
@@ -14,10 +19,12 @@ class UsersResource extends AbstractResourceListener
 
     /**
      * UsersResource constructor.
+     * @param AuthService $authService
      * @param UsersRepository $usersRepository
      */
-    public function __construct(UsersRepository $usersRepository)
+    public function __construct(AuthService $authService, UsersRepository $usersRepository)
     {
+        $this->authService = $authService;
         $this->usersRepository = $usersRepository;
     }
 
@@ -29,7 +36,12 @@ class UsersResource extends AbstractResourceListener
      */
     public function create($data)
     {
-        return $this->usersRepository->insert($data);
+        try {
+            $this->authService->hasRole('admin');
+            return $this->usersRepository->insert($data);
+        } catch (\Exception $e) {
+            return new ApiProblem($e->getCode(), $e->getMessage());
+        }
     }
 
     /**
@@ -40,7 +52,12 @@ class UsersResource extends AbstractResourceListener
      */
     public function delete($id)
     {
-        return $this->usersRepository->delete($id);
+        try {
+            $this->authService->hasRole('admin');
+            return $this->usersRepository->delete($id);
+        } catch (\Exception $e) {
+            return new ApiProblem($e->getCode(), $e->getMessage());
+        }
     }
 
     /**
@@ -62,7 +79,12 @@ class UsersResource extends AbstractResourceListener
      */
     public function fetch($id)
     {
-        return $this->usersRepository->find($id);
+        try {
+            $this->authService->hasRole('admin');
+            return $this->usersRepository->find($id);
+        } catch (\Exception $e) {
+            return new ApiProblem($e->getCode(), $e->getMessage());
+        }
     }
 
     /**
@@ -73,7 +95,12 @@ class UsersResource extends AbstractResourceListener
      */
     public function fetchAll($params = array())
     {
-        return $this->usersRepository->findAll();
+        try {
+            $this->authService->hasRole('admin');
+            return $this->usersRepository->findAll();
+        } catch (\Exception $e) {
+            return new ApiProblem($e->getCode(), $e->getMessage());
+        }
     }
 
     /**
@@ -108,6 +135,11 @@ class UsersResource extends AbstractResourceListener
      */
     public function update($id, $data)
     {
-        return $this->usersRepository->update($id, $data);
+        try {
+            $this->authService->hasRole('admin');
+            return $this->usersRepository->update($id, $data);
+        } catch (\Exception $e) {
+            return new ApiProblem($e->getCode(), $e->getMessage());
+        }
     }
 }

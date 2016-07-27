@@ -2,11 +2,16 @@
 
 namespace CodeOrders\V1\Rest\Products;
 
+use CodeOrders\V1\Rest\Auth\AuthService;
 use ZF\ApiProblem\ApiProblem;
 use ZF\Rest\AbstractResourceListener;
 
 class ProductsResource extends AbstractResourceListener
 {
+    /**
+     * @var AuthService
+     */
+    private $authService;
     /**
      * @var ProductsRepository
      */
@@ -14,10 +19,12 @@ class ProductsResource extends AbstractResourceListener
 
     /**
      * ProductsResource constructor.
+     * @param AuthService $authService
      * @param ProductsRepository $productsRepository
      */
-    public function __construct(ProductsRepository $productsRepository)
+    public function __construct(AuthService $authService, ProductsRepository $productsRepository)
     {
+        $this->authService = $authService;
         $this->productsRepository = $productsRepository;
     }
 
@@ -29,7 +36,12 @@ class ProductsResource extends AbstractResourceListener
      */
     public function create($data)
     {
-        return $this->productsRepository->insert($data);
+        try {
+            $this->authService->hasRole('admin');
+            return $this->productsRepository->insert($data);
+        } catch (\Exception $e) {
+            return new ApiProblem($e->getCode(), $e->getMessage());
+        }
     }
 
     /**
@@ -40,7 +52,12 @@ class ProductsResource extends AbstractResourceListener
      */
     public function delete($id)
     {
-        return $this->productsRepository->delete($id);
+        try {
+            $this->authService->hasRole('admin');
+            return $this->productsRepository->delete($id);
+        } catch (\Exception $e) {
+            return new ApiProblem($e->getCode(), $e->getMessage());
+        }
     }
 
     /**
@@ -62,7 +79,12 @@ class ProductsResource extends AbstractResourceListener
      */
     public function fetch($id)
     {
-        return $this->productsRepository->find($id);
+        try {
+            $this->authService->hasRole(['admin', 'salesman']);
+            return $this->productsRepository->find($id);
+        } catch (\Exception $e) {
+            return new ApiProblem($e->getCode(), $e->getMessage());
+        }
     }
 
     /**
@@ -73,7 +95,12 @@ class ProductsResource extends AbstractResourceListener
      */
     public function fetchAll($params = array())
     {
-        return $this->productsRepository->findAll();
+        try {
+            $this->authService->hasRole(['admin', 'salesman']);
+            return $this->productsRepository->findAll();
+        } catch (\Exception $e) {
+            return new ApiProblem($e->getCode(), $e->getMessage());
+        }
     }
 
     /**
@@ -108,6 +135,11 @@ class ProductsResource extends AbstractResourceListener
      */
     public function update($id, $data)
     {
-        return $this->productsRepository->update($id, $data);
+        try {
+            $this->authService->hasRole('admin');
+            return $this->productsRepository->update($id, $data);
+        } catch (\Exception $e) {
+            return new ApiProblem($e->getCode(), $e->getMessage());
+        }
     }
 }

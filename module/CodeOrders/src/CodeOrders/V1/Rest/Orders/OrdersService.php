@@ -52,6 +52,18 @@ class OrdersService
         }
     }
 
+    public function update($id, $data)
+    {
+        try {
+            if (isset($data['items'])) {
+                unset($data['items']);
+            }
+            return $this->repository->update($id, $data);
+        } catch (\Exception $e) {
+            throw new \Exception($e->getMessage());
+        }
+    }
+
     public function delete($id)
     {
         try {

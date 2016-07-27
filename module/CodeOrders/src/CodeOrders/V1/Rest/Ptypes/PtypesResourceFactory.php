@@ -5,6 +5,9 @@ class PtypesResourceFactory
 {
     public function __invoke($services)
     {
-        return new PtypesResource($services->get('CodeOrders\\V1\\Rest\\Ptypes\\PtypesRepository'));
+        return new PtypesResource(
+            $services->get('CodeOrders\\V1\\Rest\\Auth\\AuthService'),
+            $services->get('CodeOrders\\V1\\Rest\\Ptypes\\PtypesRepository')
+        );
     }
 }
