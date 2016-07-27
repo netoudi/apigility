@@ -516,6 +516,7 @@ return array(
     ),
     'service_manager' => array(
         'factories' => array(
+            'CodeOrders\\V1\\Rest\\Auth\\AuthService' => 'CodeOrders\\V1\\Rest\\Auth\\AuthServiceFactory',
             'CodeOrders\\V1\\Rest\\Users\\UsersResource' => 'CodeOrders\\V1\\Rest\\Users\\UsersResourceFactory',
             'CodeOrders\\V1\\Rest\\Users\\UsersRepository' => 'CodeOrders\\V1\\Rest\\Users\\UsersRepositoryFactory',
             'CodeOrders\\V1\\Rest\\Products\\ProductsResource' => 'CodeOrders\\V1\\Rest\\Products\\ProductsResourceFactory',

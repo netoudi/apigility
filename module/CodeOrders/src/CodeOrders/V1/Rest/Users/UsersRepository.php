@@ -59,4 +59,9 @@ class UsersRepository
     {
         return $this->tableGateway->delete(['id' => (int)$id]);
     }
+
+    public function findByUsername($username)
+    {
+        return $this->tableGateway->select(['username' => $username])->current();
+    }
 }
