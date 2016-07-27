@@ -18,7 +18,9 @@ return array(
     ),
     'zf-mvc-auth' => array(
         'authentication' => array(
-            'map' => array(),
+            'map' => array(
+                'CodeOrders\\V1' => 'oauthadapter',
+            ),
         ),
     ),
 );
