@@ -13,6 +13,10 @@ class UsersResource extends AbstractResourceListener
      */
     private $authService;
     /**
+     * @var UsersService
+     */
+    private $usersService;
+    /**
      * @var UsersRepository
      */
     private $usersRepository;
@@ -20,11 +24,13 @@ class UsersResource extends AbstractResourceListener
     /**
      * UsersResource constructor.
      * @param AuthService $authService
+     * @param UsersService $usersService
      * @param UsersRepository $usersRepository
      */
-    public function __construct(AuthService $authService, UsersRepository $usersRepository)
+    public function __construct(AuthService $authService, UsersService $usersService, UsersRepository $usersRepository)
     {
         $this->authService = $authService;
+        $this->usersService = $usersService;
         $this->usersRepository = $usersRepository;
     }
 
@@ -38,7 +44,7 @@ class UsersResource extends AbstractResourceListener
     {
         try {
             $this->authService->hasRole('admin');
-            return $this->usersRepository->insert($data);
+            return $this->usersService->insert($data);
         } catch (\Exception $e) {
             return new ApiProblem($e->getCode(), $e->getMessage());
         }
@@ -136,8 +142,16 @@ class UsersResource extends AbstractResourceListener
     public function update($id, $data)
     {
         try {
-            $this->authService->hasRole('admin');
-            return $this->usersRepository->update($id, $data);
+            $this->authService->hasRole(['admin', 'salesman']);
+            if ($this->authService->isAdmin()) {
+                return $this->usersService->update($id, $data);
+            } elseif ((int)$id == $this->authService->getUser()->getId()) {
+                if (isset($data->role)) {
+                    unset($data->role);
+                }
+                return $this->usersService->update($id, $data);
+            }
+            return new ApiProblem(401, 'Access denied');
         } catch (\Exception $e) {
             return new ApiProblem($e->getCode(), $e->getMessage());
         }

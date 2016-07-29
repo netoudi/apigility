@@ -520,6 +520,7 @@ return array(
             'CodeOrders\\V1\\Rest\\Auth\\AuthService' => 'CodeOrders\\V1\\Rest\\Auth\\AuthServiceFactory',
             'CodeOrders\\V1\\Rest\\Users\\UsersResource' => 'CodeOrders\\V1\\Rest\\Users\\UsersResourceFactory',
             'CodeOrders\\V1\\Rest\\Users\\UsersRepository' => 'CodeOrders\\V1\\Rest\\Users\\UsersRepositoryFactory',
+            'CodeOrders\\V1\\Rest\\Users\\UsersService' => 'CodeOrders\\V1\\Rest\\Users\\UsersServiceFactory',
             'CodeOrders\\V1\\Rest\\Products\\ProductsResource' => 'CodeOrders\\V1\\Rest\\Products\\ProductsResourceFactory',
             'CodeOrders\\V1\\Rest\\Products\\ProductsRepository' => 'CodeOrders\\V1\\Rest\\Products\\ProductsRepositoryFactory',
             'CodeOrders\\V1\\Rest\\Orders\\OrdersResource' => 'CodeOrders\\V1\\Rest\\Orders\\OrdersResourceFactory',
