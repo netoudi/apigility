@@ -2,8 +2,6 @@
 
 namespace CodeOrders\V1\Rest\Orders;
 
-use Zend\Stdlib\Hydrator\ObjectProperty;
-
 class OrdersService
 {
     /**
@@ -22,29 +20,36 @@ class OrdersService
 
     public function insert($data)
     {
-        $hydrator = new ObjectProperty();
-        $data = $hydrator->extract($data);
+        $total = 0;
+        $items = $data->items;
+        unset($data->items);
 
-        $items = $data['items'];
-        unset($data['items']);
-
-        $orderTable = $this->repository->getOrderTable();
+        $orderTable = $this->repository->getTableGateway();
 
         try {
             // Begin Transaction
             $orderTable->getAdapter()->getDriver()->getConnection()->beginTransaction();
 
-            $orderId = $this->repository->insert($data);
+            foreach ($items as $key => $item) {
+                $item['total'] = ($item['quantity'] * $item['price']);
+                $items[$key]['total'] = $item['total'];
+                $total += $item['total'];
+            }
+
+            $data->total = $total;
+            $data->status = 0;
+            $data->created_at = \date('Y-m-d H:i:s');
+            $order = $this->repository->insert($data);
 
             foreach ($items as $item) {
-                $item['order_id'] = $orderId;
+                $item['order_id'] = $order['id'];
                 $this->repository->insertItem($item);
             }
 
             // Commit
             $orderTable->getAdapter()->getDriver()->getConnection()->commit();
 
-            return $this->repository->find($orderId);
+            return $this->repository->find($order['id']);
         } catch (\Exception $e) {
             // Rollback
             $orderTable->getAdapter()->getDriver()->getConnection()->rollback();
@@ -52,15 +57,45 @@ class OrdersService
         }
     }
 
-    public function update($id, $data)
+    public function update($idOrder, $data)
     {
+        $order = $this->repository->find($idOrder);
+        $items = $data->items;
+        unset($data->items);
+        $total = 0;
+
+        $orderTable = $this->repository->getTableGateway();
+
         try {
-            if (isset($data['items'])) {
-                unset($data['items']);
+            // Begin Transaction
+            $orderTable->getAdapter()->getDriver()->getConnection()->beginTransaction();
+
+            foreach ($items as $key => $item) {
+                $item['total'] = ($item['quantity'] * $item['price']);
+                $items[$key]['total'] = $item['total'];
+                $total += $item['total'];
             }
-            return $this->repository->update($id, $data);
+
+            foreach ($items as $item) {
+                if (isset($item['id'])) {
+                    $this->repository->updateItem($item['id'], $item);
+                } else {
+                    $item['order_id'] = $order['id'];
+                    $this->repository->insertItem($item);
+                }
+            }
+
+            $data->total = $this->getTotal($order['id']);
+            $this->repository->update($order['id'], $data);
+
+            // Commit
+            $orderTable->getAdapter()->getDriver()->getConnection()->commit();
+
+            return $this->repository->find($order['id']);
         } catch (\Exception $e) {
-            throw new \Exception($e->getMessage());
+            // Rollback
+            $orderTable->getAdapter()->getDriver()->getConnection()->rollback();
+            throw new \Exception('Error processing order.');
         }
     }
 
@@ -79,5 +114,17 @@ class OrdersService
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage());
         }
+    }
+
+    private function getTotal($idOrder)
+    {
+        $total = 0;
+        $items = $this->repository->getItemTable()->select(['order_id' => (int)$idOrder]);
+
+        foreach ($items as $item) {
+            $total += $item->getTotal();
+        }
+
+        return $total;
     }
 }

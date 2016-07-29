@@ -2,100 +2,63 @@
 
 namespace CodeOrders\V1\Rest\Orders;
 
+use CodeOrders\V1\Rest\Repository\AbstractRepository;
 use Zend\Db\TableGateway\TableGatewayInterface;
 use Zend\Paginator\Adapter\ArrayAdapter;
 use Zend\Stdlib\Hydrator\ClassMethods;
 
-class OrdersRepository
+class OrdersRepository extends AbstractRepository
 {
-    /**
-     * @var TableGatewayInterface
-     */
-    private $orderTable;
     /**
      * @var TableGatewayInterface
      */
     private $itemTable;
 
-    /**
-     * OrdersRepository constructor.
-     * @param TableGatewayInterface $orderTable
-     * @param TableGatewayInterface $itemTable
-     */
     public function __construct(TableGatewayInterface $orderTable, TableGatewayInterface $itemTable)
     {
-        $this->orderTable = $orderTable;
+        parent::__construct($orderTable);
         $this->itemTable = $itemTable;
     }
 
     public function find($id)
     {
-        $hydrator = new ClassMethods();
-        $hydrator->addStrategy('items', new OrdersItemsHydratorStrategy(new ClassMethods()));
-        $order = $this->orderTable->select(['id' => (int)$id])->current();
-
-        if (!$order) {
-            throw new \Exception('Entity not found.');
-        }
-
+        $order = parent::find($id);
         $items = $this->itemTable->select(['order_id' => $order->getId()]);
 
         foreach ($items as $item) {
             $order->addItem($item);
         }
 
+        $hydrator = new ClassMethods();
+        $hydrator->addStrategy('items', new OrdersItemsHydratorStrategy(new ClassMethods()));
+
         return $hydrator->extract($order);
     }
 
     public function findAll()
     {
-        $hydrator = new ClassMethods();
-        $hydrator->addStrategy('items', new OrdersItemsHydratorStrategy(new ClassMethods()));
-        $orders = $this->orderTable->select();
+        $orders = $this->tableGateway->select();
         $result = [];
 
         foreach ($orders as $order) {
-            $items = $this->itemTable->select(['order_id' => $order->getId()]);
-            foreach ($items as $item) {
-                $order->addItem($item);
-            }
-
-            $result[] = $hydrator->extract($order);
+            $result[] = $this->find($order->getId());
         }
 
-        $arrayAdapter = new ArrayAdapter($result);
-        $ordersCollection = new OrdersCollection($arrayAdapter);
-
-        return $ordersCollection;
-    }
-
-    public function insert(array $data)
-    {
-        $this->orderTable->insert($data);
-
-        return $this->orderTable->getLastInsertValue();
-    }
-
-    public function update($id, array $data)
-    {
-        return $this->orderTable->update($data, ['id' => $id]);
-    }
-
-    public function delete($id)
-    {
-        return $this->orderTable->delete(['id' => $id]);
+        return new $this->paginator(new ArrayAdapter($result));
     }
 
     public function insertItem(array $data)
     {
         $this->itemTable->insert($data);
 
-        return $this->itemTable->getLastInsertValue();
+        return $this->itemTable->select(['id' => $this->itemTable->getLastInsertValue()])->current();
     }
 
-    public function getOrderTable()
+    public function updateItem($id, array $data)
     {
-        return $this->orderTable;
+        $this->itemTable->update($data, ['id' => (int)$id]);
+
+        return $this->itemTable->select(['id' => (int)$id])->current();
     }
 
     public function getItemTable()
@@ -105,42 +68,25 @@ class OrdersRepository
 
     public function findBySalesman($id, $idSalesman)
     {
-        $hydrator = new ClassMethods();
-        $hydrator->addStrategy('items', new OrdersItemsHydratorStrategy(new ClassMethods()));
-        $order = $this->orderTable->select(['id' => (int)$id, 'user_id' => (int)$idSalesman])->current();
+        $order = parent::findBy(['id' => (int)$id, 'user_id' => (int)$idSalesman])->current();
 
-        if (!$order) {
-            throw new \Exception('Entity not found.');
-        }
-
-        $items = $this->itemTable->select(['order_id' => $order->getId()]);
-
-        foreach ($items as $item) {
-            $order->addItem($item);
-        }
-
-        return $hydrator->extract($order);
+        return $this->find($order->getId());
     }
 
     public function findAllBySalesman($idSalesman)
     {
-        $hydrator = new ClassMethods();
-        $hydrator->addStrategy('items', new OrdersItemsHydratorStrategy(new ClassMethods()));
-        $orders = $this->orderTable->select(['user_id' => (int)$idSalesman]);
+        $orders = parent::findBy(['user_id' => (int)$idSalesman]);
         $result = [];
 
         foreach ($orders as $order) {
-            $items = $this->itemTable->select(['order_id' => $order->getId()]);
-            foreach ($items as $item) {
-                $order->addItem($item);
-            }
-
-            $result[] = $hydrator->extract($order);
+            $result[] = $this->find($order->getId());
         }
 
-        $arrayAdapter = new ArrayAdapter($result);
-        $ordersCollection = new OrdersCollection($arrayAdapter);
+        return new $this->paginator(new ArrayAdapter($result));
+    }
 
-        return $ordersCollection;
+    public function collection()
+    {
+        return OrdersCollection::class;
     }
 }

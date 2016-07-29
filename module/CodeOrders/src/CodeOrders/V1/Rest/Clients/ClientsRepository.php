@@ -2,56 +2,12 @@
 
 namespace CodeOrders\V1\Rest\Clients;
 
-use Zend\Db\TableGateway\TableGatewayInterface;
-use Zend\Paginator\Adapter\DbTableGateway;
-use Zend\Stdlib\Hydrator\ObjectProperty;
+use CodeOrders\V1\Rest\Repository\AbstractRepository;
 
-class ClientsRepository
+class ClientsRepository extends AbstractRepository
 {
-    /**
-     * @var TableGatewayInterface
-     */
-    private $tableGateway;
-
-    /**
-     * ClientsRepository constructor.
-     * @param TableGatewayInterface $tableGateway
-     */
-    public function __construct(TableGatewayInterface $tableGateway)
+    public function collection()
     {
-        $this->tableGateway = $tableGateway;
-    }
-
-    public function find($id)
-    {
-        $entity = $this->tableGateway->select(['id' => (int)$id]);
-
-        return $entity->current();
-    }
-
-    public function findAll()
-    {
-        $tableGateway = $this->tableGateway;
-        $paginatorAdapter = new DbTableGateway($tableGateway);
-
-        return new ClientsCollection($paginatorAdapter);
-    }
-
-    public function insert($data)
-    {
-        $hydrator = new ObjectProperty();
-        return $this->tableGateway->insert($hydrator->extract($data));
-    }
-
-    public function update($id, $data)
-    {
-        $hydrator = new ObjectProperty();
-
-        return $this->tableGateway->update($hydrator->extract($data), ['id' => (int)$id]);
-    }
-
-    public function delete($id)
-    {
-        return $this->tableGateway->delete(['id' => (int)$id]);
+        return ClientsCollection::class;
     }
 }

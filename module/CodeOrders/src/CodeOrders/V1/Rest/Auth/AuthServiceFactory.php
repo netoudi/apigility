@@ -17,7 +17,7 @@ class AuthServiceFactory implements FactoryInterface
     {
         $identity = $serviceLocator->get('api-identity');
         $usersRepository = $serviceLocator->get('CodeOrders\\V1\\Rest\\Users\\UsersRepository');
-        $user = $usersRepository->findByUsername($identity->getRoleId());
+        $user = $usersRepository->findBy(['username' => $identity->getRoleId()])->current();
 
         return new AuthService($user);
     }
