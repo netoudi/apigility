@@ -5,8 +5,11 @@ namespace CodeOrders\V1\Rest\Orders;
 class OrdersEntity
 {
     protected $id;
+    protected $client;
     protected $client_id;
+    protected $user;
     protected $user_id;
+    protected $ptype;
     protected $ptype_id;
     protected $total;
     protected $status;
@@ -42,6 +45,24 @@ class OrdersEntity
     /**
      * @return mixed
      */
+    public function getClient()
+    {
+        return $this->client;
+    }
+
+    /**
+     * @param mixed $client
+     * @return OrdersEntity
+     */
+    public function setClient($client)
+    {
+        $this->client = $client;
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
     public function getClientId()
     {
         return $this->client_id;
@@ -60,6 +81,24 @@ class OrdersEntity
     /**
      * @return mixed
      */
+    public function getUser()
+    {
+        return $this->user;
+    }
+
+    /**
+     * @param mixed $user
+     * @return OrdersEntity
+     */
+    public function setUser($user)
+    {
+        $this->user = $user;
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
     public function getUserId()
     {
         return $this->user_id;
@@ -72,6 +111,24 @@ class OrdersEntity
     public function setUserId($user_id)
     {
         $this->user_id = $user_id;
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getPtype()
+    {
+        return $this->ptype;
+    }
+
+    /**
+     * @param mixed $ptype
+     * @return OrdersEntity
+     */
+    public function setPtype($ptype)
+    {
+        $this->ptype = $ptype;
         return $this;
     }
 
@@ -134,7 +191,8 @@ class OrdersEntity
      */
     public function getCreatedAt()
     {
-        return $this->created_at;
+        $createdAt = new \DateTime($this->created_at);
+        return $createdAt->format('c');
     }
 
     /**

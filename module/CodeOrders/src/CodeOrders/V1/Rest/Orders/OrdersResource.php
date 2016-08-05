@@ -13,25 +13,19 @@ class OrdersResource extends AbstractResourceListener
      */
     private $authService;
     /**
-     * @var OrdersRepository
-     */
-    private $repository;
-    /**
      * @var OrdersService
      */
-    private $service;
+    private $ordersService;
 
     /**
      * OrdersResource constructor.
      * @param AuthService $authService
-     * @param OrdersRepository $repository
-     * @param OrdersService $service
+     * @param OrdersService $ordersService
      */
-    public function __construct(AuthService $authService, OrdersRepository $repository, OrdersService $service)
+    public function __construct(AuthService $authService, OrdersService $ordersService)
     {
         $this->authService = $authService;
-        $this->repository = $repository;
-        $this->service = $service;
+        $this->ordersService = $ordersService;
     }
 
     /**
@@ -45,7 +39,7 @@ class OrdersResource extends AbstractResourceListener
         try {
             $this->authService->hasRole(['admin', 'salesman']);
             $data->user_id = $this->authService->getUser()->getId();
-            return $this->service->insert($data);
+            return $this->ordersService->insert($data);
         } catch (\Exception $e) {
             return new ApiProblem($e->getCode(), $e->getMessage());
         }
@@ -61,7 +55,7 @@ class OrdersResource extends AbstractResourceListener
     {
         try {
             $this->authService->hasRole('admin');
-            return $this->service->delete($id);
+            return $this->ordersService->delete($id);
         } catch (\Exception $e) {
             return new ApiProblem($e->getCode(), $e->getMessage());
         }
@@ -89,9 +83,9 @@ class OrdersResource extends AbstractResourceListener
         try {
             $this->authService->hasRole(['admin', 'salesman']);
             if ($this->authService->isAdmin()) {
-                return $this->repository->find($id);
+                return $this->ordersService->find($id);
             } else {
-                return $this->repository->findBySalesman($id, $this->authService->getUser()->getId());
+                return $this->ordersService->findBySalesman($id, $this->authService->getUser()->getId());
             }
         } catch (\Exception $e) {
             return new ApiProblem($e->getCode(), $e->getMessage());
@@ -109,9 +103,9 @@ class OrdersResource extends AbstractResourceListener
         try {
             $this->authService->hasRole(['admin', 'salesman']);
             if ($this->authService->isAdmin()) {
-                return $this->repository->findAll();
+                return $this->ordersService->findAll();
             } else {
-                return $this->repository->findAllBySalesman($this->authService->getUser()->getId());
+                return $this->ordersService->findAllBySalesman($this->authService->getUser()->getId());
             }
         } catch (\Exception $e) {
             return new ApiProblem($e->getCode(), $e->getMessage());
@@ -152,7 +146,7 @@ class OrdersResource extends AbstractResourceListener
     {
         try {
             $this->authService->hasRole('admin');
-            return $this->service->update($id, $data);
+            return $this->ordersService->update($id, $data);
         } catch (\Exception $e) {
             return new ApiProblem($e->getCode(), $e->getMessage());
         }
