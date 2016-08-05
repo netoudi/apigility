@@ -16,5 +16,7 @@ interface RepositoryInterface
 
     public function findBy(array $columns);
 
+    public function getPaginator($adapter);
+
     public function getTableGateway();
 }

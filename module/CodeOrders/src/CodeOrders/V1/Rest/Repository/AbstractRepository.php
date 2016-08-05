@@ -67,7 +67,7 @@ abstract class AbstractRepository implements RepositoryInterface
 
     public function findAll()
     {
-        return new $this->paginator(new DbTableGateway($this->tableGateway));
+        return $this->getPaginator(new DbTableGateway($this->tableGateway));
     }
 
     public function findBy(array $columns)
@@ -79,6 +79,11 @@ abstract class AbstractRepository implements RepositoryInterface
         }
 
         return $result;
+    }
+
+    public function getPaginator($adapter)
+    {
+        return new $this->paginator($adapter);
     }
 
     public function getTableGateway()
