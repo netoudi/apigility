@@ -52,6 +52,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'angular-oauth2'])
         templateUrl: 'templates/tabs.html'
       })
       .state('tabs.orders', {
+        cache: false,
         url: '/orders',
         views: {
           'orders-tab': {
@@ -64,7 +65,8 @@ angular.module('starter', ['ionic', 'starter.controllers', 'angular-oauth2'])
         url: '/orders/create',
         views: {
           'orders-create-tab': {
-            templateUrl: 'templates/orders_create.html'
+            templateUrl: 'templates/orders_create.html',
+            controller: 'OrderNewCtrl'
           }
         }
       })
