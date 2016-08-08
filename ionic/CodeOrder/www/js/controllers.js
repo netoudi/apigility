@@ -14,6 +14,23 @@ angular.module('starter.controllers', [])
     }
   ])
 
+  .controller('LogoutCtrl', [
+    '$scope', '$state', 'OAuthToken', '$ionicHistory',
+    function ($scope, $state, OAuthToken, $ionicHistory) {
+      $scope.logout = function () {
+        OAuthToken.removeToken();
+        $ionicHistory.clearCache();
+        $ionicHistory.clearHistory();
+        $ionicHistory.nextViewOptions({
+          disabledBack: true,
+          historyRoot: true
+        });
+
+        $state.go('login');
+      }
+    }
+  ])
+
   .controller('OrdersCtrl', [
     '$scope', '$http', '$state', 'OAuthToken',
     function ($scope, $http, $state, OAuthToken) {

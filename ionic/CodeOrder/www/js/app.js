@@ -5,7 +5,7 @@
 // the 2nd parameter is an array of 'requires'
 angular.module('starter', ['ionic', 'starter.controllers', 'angular-oauth2'])
 
-  .run(function ($ionicPlatform) {
+  .run(function ($ionicPlatform, $rootScope, OAuth, $state) {
     $ionicPlatform.ready(function () {
       if (window.cordova && window.cordova.plugins.Keyboard) {
         // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
@@ -19,6 +19,15 @@ angular.module('starter', ['ionic', 'starter.controllers', 'angular-oauth2'])
       }
       if (window.StatusBar) {
         StatusBar.styleDefault();
+      }
+    });
+
+    $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
+      if (toState.name != 'login') {
+        if (!OAuth.isAuthenticated()) {
+          event.preventDefault();
+          $state.go('login');
+        }
       }
     });
   })
@@ -42,6 +51,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'angular-oauth2'])
 
     $stateProvider
       .state('login', {
+        cache: false,
         url: '/login',
         templateUrl: 'templates/login.html',
         controller: 'LoginCtrl'
@@ -50,6 +60,15 @@ angular.module('starter', ['ionic', 'starter.controllers', 'angular-oauth2'])
         url: '/t',
         abstract: true,
         templateUrl: 'templates/tabs.html'
+      })
+      .state('tabs.logout', {
+        url: '/logout',
+        views: {
+          'logout-tab': {
+            templateUrl: 'templates/logout.html',
+            controller: 'LogoutCtrl'
+          }
+        }
       })
       .state('tabs.orders', {
         cache: false,
