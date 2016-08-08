@@ -15,7 +15,7 @@
   <ion-refresher on-refresh="doRefresh()"></ion-refresher>
 
   <ion-list show-delete="data.showDelete">
-    <ion-item ng-repeat="order in orders | filter: search">
+    <ion-item ng-repeat="order in orders | filter: search" ng-click="show(order)">
       <ion-delete-button class="ion-minus-circled" ng-click="onOrderDelete(order)"></ion-delete-button>
       #{{ order.id }} - Total: $ {{ order.total }} - {{ order.created_at }}
     </ion-item>

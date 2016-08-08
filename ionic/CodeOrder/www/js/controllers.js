@@ -10,7 +10,7 @@ angular.module('starter.controllers', [])
           }, function (error) {
             $scope.error_login = 'Username or password is invalid.'
           });
-      }
+      };
     }
   ])
 
@@ -33,12 +33,30 @@ angular.module('starter.controllers', [])
           });
       };
 
+      $scope.show = function (order) {
+        $state.go('tabs.order-show', {id: order.id});
+      };
+
       $scope.doRefresh = function () {
         $scope.getOrders();
         $scope.$broadcast('scroll.refreshComplete')
-      }
+      };
 
       $scope.getOrders();
+    }
+  ])
+
+  .controller('OrderShowCtrl', [
+    '$scope', '$http', '$state', '$stateParams',
+    function ($scope, $http, $state, $stateParams) {
+      $http.get('http://localhost:8888/orders/' + $stateParams.id)
+        .then(function (data) {
+          $scope.order = data.data;
+        });
+
+      $scope.back = function () {
+        $state.go('tabs.orders');
+      };
     }
   ])
 

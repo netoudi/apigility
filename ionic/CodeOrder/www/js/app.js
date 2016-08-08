@@ -68,6 +68,15 @@ angular.module('starter', ['ionic', 'starter.controllers', 'angular-oauth2'])
           }
         }
       })
+      .state('tabs.order-show', {
+        url: '/order/show/:id',
+        views: {
+          'orders-tab': {
+            templateUrl: 'templates/order_show.html',
+            controller: 'OrderShowCtrl'
+          }
+        }
+      })
     ;
 
     $urlRouterProvider.otherwise('/login');

@@ -1,0 +1,69 @@
+<ion-header-bar class="bar-positive">
+  <button class="button button-icon ion-backspace" ng-click="back()"></button>
+  <h1 class="title">Order #{{ order.id }}</h1>
+</ion-header-bar>
+
+<ion-content>
+
+  <div class="list">
+    <div class="item item-divider">
+      <div class="row">
+        <div class="col">ID</div>
+        <div class="col">Status</div>
+        <div class="col">Created</div>
+      </div>
+    </div>
+    <div class="item">
+      <div class="row">
+        <div class="col">{{ order.id }}</div>
+        <div class="col">{{ order.status }}</div>
+        <div class="col">{{ order.created_at | date: 'short' }}</div>
+      </div>
+    </div>
+
+    <div class="item item-divider">Salesman</div>
+    <div class="item">{{ order.user.first_name }} {{ order.user.last_name }}</div>
+
+    <div class="item item-divider">Client</div>
+    <div class="item">
+      {{ order.client.name }}
+    </div>
+    <div class="item">
+      <p>
+        <b>Document:</b> {{ order.client.document }}<br>
+        <b>Address:</b> {{ order.client.address }}<br>
+        <b>Zipcode:</b> {{ order.client.zipcode }}<br>
+        <b>City:</b> {{ order.client.city }}<br>
+        <b>State:</b> {{ order.client.state }}<br>
+        <b>Responsible:</b> {{ order.client.responsible }}<br>
+        <b>Email:</b> {{ order.client.email }}<br>
+        <b>Phone:</b> {{ order.client.phone }}<br>
+        <b>Obs:</b> {{ order.client.obs }}
+      </p>
+    </div>
+
+    <div class="item item-divider">Payment Type</div>
+    <a class="item">{{ order.ptype.name }}</a>
+
+    <div class="item item-divider">Itens</div>
+    <div class="row header">
+      <div class="col"><b>Product</b></div>
+      <div class="col"><b>Quantity</b></div>
+      <div class="col"><b>Price</b></div>
+      <div class="col"><b>Total</b></div>
+    </div>
+    <div class="row" ng-repeat="o in order.items">
+      <div class="col">{{ o.product_name }}</div>
+      <div class="col">{{ o.quantity }}</div>
+      <div class="col">$ {{ o.price }}</div>
+      <div class="col">$ {{ o.total }}</div>
+    </div>
+    <div class="item">
+      <div class="row">
+        <div class="col text-left">Total</div>
+        <div class="col text-right">$ {{ order.total }}</div>
+      </div>
+    </div>
+  </div>
+
+</ion-content>
