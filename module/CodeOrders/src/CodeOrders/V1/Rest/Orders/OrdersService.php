@@ -140,14 +140,14 @@ class OrdersService
             $order = $this->ordersRepository->insert($data);
 
             foreach ($items as $item) {
-                $item['order_id'] = $order['id'];
+                $item['order_id'] = $order->getId();
                 $this->ordersRepository->insertItem($item);
             }
 
             // Commit
             $orderTable->getAdapter()->getDriver()->getConnection()->commit();
 
-            return $this->ordersRepository->find($order['id']);
+            return $this->find($order->getId());
         } catch (\Exception $e) {
             // Rollback
             $orderTable->getAdapter()->getDriver()->getConnection()->rollback();
@@ -178,18 +178,18 @@ class OrdersService
                 if (isset($item['id'])) {
                     $this->ordersRepository->updateItem($item['id'], $item);
                 } else {
-                    $item['order_id'] = $order['id'];
+                    $item['order_id'] = $order->getId();
                     $this->ordersRepository->insertItem($item);
                 }
             }
 
-            $data->total = $this->getTotal($order['id']);
-            $this->ordersRepository->update($order['id'], $data);
+            $data->total = $this->getTotal($order->getId());
+            $this->ordersRepository->update($order->getId(), $data);
 
             // Commit
             $orderTable->getAdapter()->getDriver()->getConnection()->commit();
 
-            return $this->ordersRepository->find($order['id']);
+            return $this->find($order->getId());
         } catch (\Exception $e) {
             // Rollback
             $orderTable->getAdapter()->getDriver()->getConnection()->rollback();
@@ -202,13 +202,13 @@ class OrdersService
         try {
             $order = $this->ordersRepository->find($id);
             $itemTable = $this->ordersRepository->getItemTable();
-            $items = $itemTable->select(['order_id' => $order['id']]);
+            $items = $itemTable->select(['order_id' => $order->getId()]);
 
             foreach ($items as $item) {
                 $itemTable->delete(['id' => $item->getId()]);
             }
 
-            return $this->ordersRepository->delete($order['id']);
+            return $this->ordersRepository->delete($order->getId());
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage());
         }
