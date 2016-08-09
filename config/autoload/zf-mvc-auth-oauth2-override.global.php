@@ -10,4 +10,11 @@ return array(
             'ZF\OAuth2\Service\OAuth2Server' => 'ZF\MvcAuth\Factory\NamedOAuth2ServerFactory',
         ),
     ),
+    'zf-oauth2' => array(
+        'access_lifetime' => 3600,
+        'allow_implicit' => true,
+        'options' => [
+            'always_issue_new_refresh_token' => true,
+        ],
+    ),
 );
