@@ -1,8 +1,13 @@
 angular.module('starter.controllers', [])
 
   .controller('LoginCtrl', [
-    '$scope', '$http', '$state', 'OAuth',
-    function ($scope, $http, $state, OAuth) {
+    '$rootScope', '$scope', '$http', '$state', 'OAuth',
+    function ($rootScope, $scope, $http, $state, OAuth) {
+      if (!$rootScope.error_login) {
+        $scope.error_login = $rootScope.error_login;
+        $rootScope.error_login = null;
+      }
+
       $scope.login = function (data) {
         OAuth.getAccessToken(data)
           .then(function (data) {
@@ -15,19 +20,52 @@ angular.module('starter.controllers', [])
   ])
 
   .controller('LogoutCtrl', [
-    '$scope', '$state', 'OAuthToken', '$ionicHistory',
-    function ($scope, $state, OAuthToken, $ionicHistory) {
+    '$scope', '$state', 'logoutService',
+    function ($scope, $state, logoutService) {
       $scope.logout = function () {
-        OAuthToken.removeToken();
-        $ionicHistory.clearCache();
-        $ionicHistory.clearHistory();
-        $ionicHistory.nextViewOptions({
-          disabledBack: true,
-          historyRoot: true
-        });
-
+        logoutService.logout();
         $state.go('login');
       }
+    }
+  ])
+
+  .controller('RefreshTokenCtrl', [
+    '$rootScope', '$state', '$scope', '$timeout', 'OAuth', 'authService', 'logoutService',
+    function ($rootScope, $state, $scope, $timeout, OAuth, authService, logoutService) {
+      function destroyModal() {
+        if ($rootScope.modal) {
+          $rootScope.modal.hide();
+          $rootScope.modal = false;
+        }
+      }
+
+      $scope.$on('event:auth-loginConfirmed', function () {
+        destroyModal();
+      });
+
+      $scope.$on('event:auth-loginCancelled', function () {
+        destroyModal();
+        logoutService.logout();
+        $rootScope.error_login = 'Your session has expired, please log in again!';
+      });
+
+      $rootScope.$on('$stateChangeStart',
+        function (event, toState, toParams, fromState, fromParams) {
+          if ($rootScope.modal) {
+            authService.loginCancelled();
+            event.preventDefault();
+            $state.go('login');
+          }
+        });
+
+      OAuth.getRefreshToken().then(function () {
+        $timeout(function () {
+          authService.loginConfirmed();
+        }, 10000);
+      }, function () {
+        authService.loginCancelled();
+        $state.go('login');
+      });
     }
   ])
 
